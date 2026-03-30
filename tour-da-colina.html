@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tour da Colina — Proposta de Reestruturação</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F7F7F5;color:#1a1a1a;min-height:100vh;}
+
+.page-wrap{max-width:860px;margin:0 auto;padding:24px 20px 60px;}
+
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 0 16px;border-bottom:2px solid #C8A951;margin-bottom:0;}
+.logo-area{display:flex;align-items:center;gap:10px;}
+.logo-box{width:36px;height:36px;background:#000;border-radius:6px;display:flex;align-items:center;justify-content:center;}
+.logo-v{font-size:18px;font-weight:bold;color:#C8A951;font-family:Georgia,serif;}
+.brand-name{font-size:13px;font-weight:600;color:#1a1a1a;}
+.brand-sub{font-size:10px;color:#888;}
+.top-date{font-size:11px;color:#888;}
+
+.nav-bar{display:flex;gap:2px;padding:0;border-bottom:1px solid #E0E0E0;margin-bottom:0;flex-wrap:wrap;background:#fff;position:sticky;top:0;z-index:100;}
+.nav-btn{font-size:11px;font-weight:600;padding:10px 16px;border:none;background:transparent;cursor:pointer;color:#888;border-bottom:3px solid transparent;margin-bottom:-1px;letter-spacing:0.05em;text-transform:uppercase;transition:color 0.15s;}
+.nav-btn:hover{color:#5A3E00;}
+.nav-btn.active{color:#8B6914;border-bottom-color:#C8A951;}
+
+.slide{display:none;padding:2rem 0;}
+.slide.active{display:block;}
+
+/* CAPA */
+.capa{text-align:center;padding:3.5rem 1rem 3rem;}
+.capa-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;background:#FDF3D0;padding:5px 16px;border-radius:20px;margin-bottom:1.5rem;border:1px solid #E8C84A;}
+.capa-titulo{font-size:32px;font-weight:700;color:#1a1a1a;line-height:1.25;margin-bottom:0.5rem;}
+.capa-sub{font-size:15px;color:#666;margin-bottom:2rem;line-height:1.6;}
+.capa-divider{width:48px;height:3px;background:#C8A951;margin:0 auto 2.5rem;}
+.capa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:560px;margin:0 auto 2.5rem;}
+.capa-stat{background:#fff;border:1px solid #E8E8E8;border-radius:12px;padding:20px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.capa-stat-val{font-size:26px;font-weight:700;color:#1a1a1a;margin-bottom:4px;}
+.capa-stat-val.gold{color:#C8A951;}
+.capa-stat-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.06em;}
+.capa-nota{font-size:12px;color:#aaa;line-height:1.7;max-width:500px;margin:0 auto;}
+
+/* SEÇÕES */
+.s-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#C8A951;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #C8A951;display:inline-block;}
+.s-headline{font-size:22px;font-weight:700;color:#1a1a1a;margin-bottom:6px;margin-top:4px;}
+.s-desc{font-size:13px;color:#666;line-height:1.7;margin-bottom:1.5rem;}
+
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem;}
+.kpi{background:#fff;border:1px solid #E8E8E8;border-radius:10px;padding:14px;}
+.kpi-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;}
+.kpi-val{font-size:20px;font-weight:700;color:#1a1a1a;}
+.kpi-sub{font-size:11px;margin-top:3px;}
+.red{color:#A32D2D;} .grn{color:#3B6D11;} .gld{color:#8B6914;}
+
+/* DRE TABLE */
+.dre-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:1.5rem;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #E8E8E8;}
+.dre-tbl th{text-align:left;padding:10px 12px;font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.05em;background:#FAFAFA;border-bottom:1px solid #E8E8E8;}
+.dre-tbl th.r{text-align:right;}
+.dre-tbl td{padding:8px 12px;color:#1a1a1a;border-bottom:1px solid #F5F5F5;}
+.dre-tbl td.r{text-align:right;font-variant-numeric:tabular-nums;}
+.dre-tbl tr.sub td{font-weight:600;background:#FAFAFA;}
+.dre-tbl tr.ind td:first-child{padding-left:28px;color:#666;}
+.dre-tbl tr.tot td{font-weight:700;font-size:14px;background:#FDF3D0;color:#5A3E00;}
+.dre-tbl tr:last-child td{border-bottom:none;}
+
+/* ALERTS */
+.alert-strip{border-left:4px solid #C8A951;background:#FFFBF0;padding:12px 16px;margin-bottom:10px;font-size:13px;color:#5A3E00;border-radius:0 8px 8px 0;}
+.alert-strip b{font-weight:700;}
+
+/* CHART LEGEND */
+.chart-lbl{display:flex;gap:20px;margin-bottom:10px;font-size:12px;color:#666;}
+.chart-dot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:5px;}
+.chart-wrap{position:relative;width:100%;background:#fff;border:1px solid #E8E8E8;border-radius:10px;padding:16px;}
+
+/* MODELS */
+.model-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:1.5rem;}
+.model-card{border:1px solid #E8E8E8;border-radius:12px;padding:18px;background:#fff;}
+.model-card.prop{border:2px solid #C8A951;}
+.model-badge{display:inline-block;font-size:10px;padding:3px 12px;border-radius:12px;background:#FDF3D0;color:#8B6914;margin-bottom:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;border:1px solid #E8C84A;}
+.model-tit{font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:12px;}
+.model-r{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid #F5F5F5;color:#666;}
+.model-r.bold{font-weight:700;font-size:14px;color:#1a1a1a;border:none;padding-top:10px;}
+.model-r span:last-child{font-variant-numeric:tabular-nums;}
+
+/* HIGHLIGHT BOX */
+.prop-highlight{background:#FDF3D0;border-radius:12px;padding:18px 22px;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;border:1px solid #E8C84A;}
+.prop-h-lbl{font-size:10px;color:#8B6914;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;font-weight:700;}
+.prop-h-val{font-size:22px;font-weight:700;color:#5A3E00;}
+
+/* SIMULADOR */
+.sim-controls{background:#fff;border:1px solid #E8E8E8;border-radius:12px;padding:20px;margin-bottom:1.5rem;}
+.sim-row{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.sim-lbl{font-size:13px;color:#666;min-width:200px;}
+.sim-val{font-size:14px;font-weight:700;min-width:130px;text-align:right;color:#1a1a1a;}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:6px;border-radius:3px;background:#E0E0E0;outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#C8A951;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #C8A951;}
+
+.prog-wrap{margin:0;}
+.prog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.prog-title{font-size:12px;color:#666;}
+.prog-track{width:100%;height:10px;background:#E8E8E8;border-radius:5px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:5px;transition:width 0.2s,background 0.2s;}
+.prog-labs{display:flex;justify-content:space-between;font-size:10px;color:#aaa;margin-top:4px;}
+
+.status-bar{background:#fff;border:1px solid #E8E8E8;border-radius:10px;padding:14px 18px;margin-bottom:1.5rem;display:flex;gap:28px;flex-wrap:wrap;}
+.status-item .status-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;font-weight:600;}
+.status-val{font-size:15px;font-weight:700;}
+
+/* FOOTER */
+.slide-footer{margin-top:2rem;padding-top:14px;border-top:1px solid #E8E8E8;font-size:11px;color:#bbb;display:flex;justify-content:space-between;}
+
+@media(max-width:600px){
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .model-grid{grid-template-columns:1fr;}
+  .capa-grid{grid-template-columns:1fr;}
+  .prop-highlight{flex-direction:column;}
+  .status-bar{flex-direction:column;gap:14px;}
+  .nav-btn{font-size:10px;padding:8px 10px;}
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<div class="top-bar">
+  <div class="logo-area">
+    <div class="logo-box"><span class="logo-v">V</span></div>
+    <div>
+      <div class="brand-name">Club de Regatas Vasco da Gama</div>
+      <div class="brand-sub">Tour da Colina — Proposta de Reestruturação</div>
+    </div>
+  </div>
+  <div class="top-date">Março 2026</div>
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn active" onclick="goSlide(0)">Visão Geral</button>
+  <button class="nav-btn" onclick="goSlide(1)">Diagnóstico 2024–25</button>
+  <button class="nav-btn" onclick="goSlide(2)">Alertas</button>
+  <button class="nav-btn" onclick="goSlide(3)">Nova Proposta</button>
+  <button class="nav-btn" onclick="goSlide(4)">Simulador</button>
+</div>
+
+<!-- SLIDE 0: CAPA -->
+<div id="slide0" class="slide active">
+  <div class="capa">
+    <div class="capa-badge">Proposta Confidencial — CRVG / SAF</div>
+    <div class="capa-titulo">Tour da Colina<br>Uma oportunidade de crescimento compartilhado</div>
+    <div class="capa-sub">Diagnóstico financeiro 2024–2025 e proposta de novo modelo operacional</div>
+    <div class="capa-divider"></div>
+    <div class="capa-grid">
+      <div class="capa-stat">
+        <div class="capa-stat-val">R$ 1,57M</div>
+        <div class="capa-stat-lbl">Bilheteria média anual</div>
+      </div>
+      <div class="capa-stat">
+        <div class="capa-stat-val gold">50 / 50</div>
+        <div class="capa-stat-lbl">Divisão proposta</div>
+      </div>
+      <div class="capa-stat">
+        <div class="capa-stat-val">+ 25%</div>
+        <div class="capa-stat-lbl">Meta de crescimento</div>
+      </div>
+    </div>
+    <div class="capa-nota">Este documento apresenta os dados financeiros do Tour da Colina nos anos de 2024 e 2025, seguidos de uma proposta de novo modelo de gestão e distribuição de resultado entre CRVG e SAF.</div>
+  </div>
+  <div class="slide-footer"><span>Club de Regatas Vasco da Gama — Confidencial</span><span>Março 2026</span></div>
+</div>
+
+<!-- SLIDE 1: DIAGNÓSTICO -->
+<div id="slide1" class="slide">
+  <div class="s-title">Diagnóstico financeiro</div>
+  <div class="s-headline">DRE 2024 e 2025 — modelo atual</div>
+  <div class="s-desc">No modelo vigente, a SAF organiza e opera o tour, arcando com todos os custos. O CRVG recebe 25% da bilheteria bruta sem incorrer em nenhuma despesa operacional.</div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-lbl">Bilheteria 2024</div><div class="kpi-val">R$ 1,72M</div><div class="kpi-sub" style="color:#888">Melhor ano</div></div>
+    <div class="kpi"><div class="kpi-lbl">Bilheteria 2025</div><div class="kpi-val">R$ 1,42M</div><div class="kpi-sub red">▼ 17,7% vs 2024</div></div>
+    <div class="kpi"><div class="kpi-lbl">CRVG recebeu (2024)</div><div class="kpi-val">R$ 431K</div><div class="kpi-sub" style="color:#888">Sem nenhum custo</div></div>
+    <div class="kpi"><div class="kpi-lbl">CRVG recebeu (2025)</div><div class="kpi-val">R$ 355K</div><div class="kpi-sub red">▼ 17,7%</div></div>
+  </div>
+
+  <table class="dre-tbl">
+    <thead><tr><th>Linha</th><th class="r">2024</th><th class="r">2025</th><th class="r">Variação</th></tr></thead>
+    <tbody>
+      <tr class="sub"><td>Bilheteria bruta total</td><td class="r">R$ 1.722.552</td><td class="r">R$ 1.418.120</td><td class="r red">-17,7%</td></tr>
+      <tr class="ind"><td>(–) Repasse CRVG 25%</td><td class="r">R$ 430.638</td><td class="r">R$ 354.530</td><td class="r red">-17,7%</td></tr>
+      <tr class="ind"><td>(–) TEF ~5% receita SAF</td><td class="r">R$ 64.596</td><td class="r">R$ 47.583</td><td class="r grn">-26,4%</td></tr>
+      <tr class="sub"><td>Receita líquida SAF</td><td class="r">R$ 1.227.318</td><td class="r">R$ 1.010.411</td><td class="r red">-17,7%</td></tr>
+      <tr class="ind"><td>(–) Custos de folha</td><td class="r">R$ 336.828</td><td class="r">R$ 238.120</td><td class="r grn">-29,3%</td></tr>
+      <tr class="ind"><td>(–) Custos operacionais</td><td class="r">R$ 69.735</td><td class="r">R$ 82.102</td><td class="r red">+17,7%</td></tr>
+      <tr class="ind"><td>(–) Outros custos</td><td class="r">R$ 1.410</td><td class="r">R$ 16.208</td><td class="r red">+1.050%</td></tr>
+      <tr class="tot"><td>EBIT — resultado SAF</td><td class="r">R$ 819.346</td><td class="r">R$ 673.981</td><td class="r">-17,7%</td></tr>
+      <tr><td style="font-size:11px;color:#aaa;">Margem EBIT</td><td class="r" style="font-size:11px;color:#aaa;">66,8%</td><td class="r" style="font-size:11px;color:#aaa;">66,7%</td><td class="r" style="font-size:11px;color:#aaa;">estável</td></tr>
+    </tbody>
+  </table>
+
+  <div class="chart-wrap">
+    <div class="chart-lbl">
+      <span><span class="chart-dot" style="background:#1a1a1a;"></span>2024</span>
+      <span><span class="chart-dot" style="background:#C8A951;"></span>2025</span>
+    </div>
+    <div style="position:relative;height:220px;"><canvas id="cBil"></canvas></div>
+  </div>
+  <div class="slide-footer"><span>Club de Regatas Vasco da Gama — Confidencial</span><span>1 / 4</span></div>
+</div>
+
+<!-- SLIDE 2: ALERTAS -->
+<div id="slide2" class="slide">
+  <div class="s-title">Alertas</div>
+  <div class="s-headline">Sinais de deterioração que exigem ação</div>
+  <div class="s-desc">A margem EBIT permaneceu estável, mas isso mascara quedas severas de volume. O tour perdeu R$ 304 mil de bilheteria entre 2024 e 2025 — quase 4 meses de receita.</div>
+
+  <div class="alert-strip"><b>Queda de 17,7% na bilheteria.</b> De R$ 1,72M para R$ 1,42M em um único ano. A tendência não se reverteu sozinha.</div>
+  <div class="alert-strip"><b>Colapso no segundo semestre.</b> Julho, agosto, setembro e outubro de 2025 registraram quedas de 42% a 55% vs 2024 — exatamente o período de maior potencial turístico do Rio.</div>
+  <div class="alert-strip"><b>Custos crescem na contramão da receita.</b> Custos operacionais subiram +17,7% enquanto a receita caiu. "Outros custos" saltaram de R$ 1,4K para R$ 16,2K (+1.050%) sem explicação clara na DRE.</div>
+  <div class="alert-strip"><b>O CRVG não tem visibilidade nem controle</b> sobre a operação que sustenta sua receita do tour. O ativo histórico é do clube — a gestão e o resultado, não.</div>
+
+  <div class="chart-wrap" style="margin-top:1.5rem;">
+    <div style="font-size:12px;color:#888;margin-bottom:10px;font-weight:600;">Variação mensal da bilheteria: 2025 vs 2024 (%)</div>
+    <div style="position:relative;height:220px;"><canvas id="cVar"></canvas></div>
+  </div>
+  <div class="slide-footer"><span>Club de Regatas Vasco da Gama — Confidencial</span><span>2 / 4</span></div>
+</div>
+
+<!-- SLIDE 3: PROPOSTA -->
+<div id="slide3" class="slide">
+  <div class="s-title">Nova proposta</div>
+  <div class="s-headline">CRVG organiza — resultado dividido 50/50</div>
+  <div class="s-desc">O CRVG assume a organização do Tour da Colina, que já é seu ativo histórico e institucional. A SAF continua responsável pelos custos operacionais. O resultado líquido é dividido igualmente entre as partes.</div>
+
+  <div class="model-grid">
+    <div class="model-card">
+      <div class="model-tit" style="color:#888;">Modelo atual</div>
+      <div class="model-r"><span>Organizador</span><span>SAF</span></div>
+      <div class="model-r"><span>Quem paga os custos</span><span>SAF</span></div>
+      <div class="model-r"><span>CRVG recebe</span><span>25% bruto</span></div>
+      <div class="model-r"><span>SAF retém</span><span>~75% líquido</span></div>
+      <div class="model-r bold"><span>CRVG (média 24/25)</span><span>R$ 393K / ano</span></div>
+    </div>
+    <div class="model-card prop">
+      <div class="model-badge">proposta</div>
+      <div class="model-tit">Novo modelo</div>
+      <div class="model-r"><span>Organizador</span><span style="color:#8B6914;font-weight:700;">CRVG</span></div>
+      <div class="model-r"><span>Quem paga os custos</span><span>SAF (mantido)</span></div>
+      <div class="model-r"><span>CRVG recebe</span><span style="color:#8B6914;font-weight:700;">50% do resultado</span></div>
+      <div class="model-r"><span>SAF recebe</span><span>50% do resultado</span></div>
+      <div class="model-r bold"><span>CRVG (na meta)</span><span style="color:#8B6914;">R$ 747K / ano</span></div>
+    </div>
+  </div>
+
+  <div class="prop-highlight">
+    <div>
+      <div class="prop-h-lbl">Ganho adicional CRVG na meta</div>
+      <div class="prop-h-val">+ R$ 354.000 / ano</div>
+    </div>
+    <div>
+      <div class="prop-h-lbl">Crescimento necessário</div>
+      <div class="prop-h-val">+ 25,1% sobre a média</div>
+    </div>
+    <div>
+      <div class="prop-h-lbl">SAF mantém histórico</div>
+      <div class="prop-h-val">R$ 747K garantido</div>
+    </div>
+  </div>
+
+  <div class="s-desc">A lógica é simples: com o CRVG como organizador, a bilheteria tende a crescer acima do patamar atual — recuperando as quedas de 2025 e abrindo novas frentes comerciais. A partir da meta de R$ 1,96M de bilheteria anual, ambas as partes saem ganhando em relação ao modelo vigente. Use o Simulador para explorar diferentes cenários.</div>
+  <div class="slide-footer"><span>Club de Regatas Vasco da Gama — Confidencial</span><span>3 / 4</span></div>
+</div>
+
+<!-- SLIDE 4: SIMULADOR -->
+<div id="slide4" class="slide">
+  <div class="s-title">Simulador financeiro</div>
+  <div class="s-headline">Ajuste a bilheteria e veja o resultado de cada parte</div>
+  <div class="s-desc">Deslize para projetar a bilheteria anual e comparar os dois modelos em tempo real. A linha dourada marca a meta mínima para a SAF manter seu resultado histórico.</div>
+
+  <div class="sim-controls">
+    <div class="sim-row" style="margin-bottom:20px;">
+      <span class="sim-lbl">Bilheteria anual projetada</span>
+      <input type="range" min="1200000" max="2500000" step="10000" value="1963714" id="slBil">
+      <span class="sim-val" id="lBil">R$ 1.963.714</span>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-head">
+        <span class="prog-title">Progresso em relação à meta mínima (R$ 1,96M)</span>
+        <span style="font-size:14px;font-weight:700;" id="lPct">100,0%</span>
+      </div>
+      <div class="prog-track">
+        <div class="prog-fill" id="pFill" style="width:60%;background:#C8A951;"></div>
+      </div>
+      <div class="prog-labs"><span>R$ 1,2M</span><span>R$ 2,5M</span></div>
+    </div>
+  </div>
+
+  <div class="model-grid">
+    <div class="model-card">
+      <div class="model-tit" style="color:#888;">Modelo atual — SAF organiza</div>
+      <div class="model-r"><span>Bilheteria bruta</span><span id="a1">—</span></div>
+      <div class="model-r"><span>Repasse CRVG (25%)</span><span id="a2">—</span></div>
+      <div class="model-r"><span>TEF (~5% rec. SAF)</span><span id="a3">—</span></div>
+      <div class="model-r"><span>Custos SAF</span><span id="a4">—</span></div>
+      <div class="model-r bold"><span>SAF retém</span><span id="a5">—</span></div>
+      <div class="model-r bold" style="color:#8B6914;"><span>CRVG recebe</span><span id="a6">—</span></div>
+    </div>
+    <div class="model-card prop">
+      <div class="model-badge">proposta</div>
+      <div class="model-tit">Novo modelo — CRVG organiza</div>
+      <div class="model-r"><span>Bilheteria bruta</span><span id="b1">—</span></div>
+      <div class="model-r"><span>TEF (~5%)</span><span id="b2">—</span></div>
+      <div class="model-r"><span>Custos SAF</span><span id="b3">—</span></div>
+      <div class="model-r"><span>Resultado bruto</span><span id="b4">—</span></div>
+      <div class="model-r bold"><span>SAF recebe (50%)</span><span id="b5">—</span></div>
+      <div class="model-r bold" style="color:#8B6914;"><span>CRVG recebe (50%)</span><span id="b6">—</span></div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-item"><div class="status-lbl">SAF vs meta histórica</div><div class="status-val" id="sSaf">—</div></div>
+    <div class="status-item"><div class="status-lbl">CRVG vs modelo atual</div><div class="status-val" id="sCrvg">—</div></div>
+    <div class="status-item"><div class="status-lbl">Crescimento necessário vs 2025</div><div class="status-val" id="sGrow">—</div></div>
+  </div>
+
+  <div class="chart-wrap">
+    <div style="font-size:12px;color:#888;margin-bottom:10px;font-weight:600;">Comparativo de resultado — modelo atual vs proposta</div>
+    <div style="position:relative;height:200px;"><canvas id="cSim"></canvas></div>
+  </div>
+  <div class="slide-footer"><span>Club de Regatas Vasco da Gama — Confidencial</span><span>4 / 4</span></div>
+</div>
+
+</div>
+
+<script>
+const MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const BIL24=[150850,60130,74795,60235,82985,65975,224525,184100,202930,258685,206055,151287];
+const BIL25=[149240,35615,82270,66335,77810,76220,113220,83525,117360,148895,181695,285935];
+const CUSTOS=372201,META_SAF=746663,CRVG_MEDIA=392584,BIL25T=1418120;
+const META_MIN=1963714,MIN_R=1200000,MAX_R=2500000;
+
+function fr(v){return 'R$ '+Math.round(v).toLocaleString('pt-BR');}
+function fp(v){return (v>=0?'+':'')+v.toFixed(1)+'%';}
+
+var charts={};
+
+function goSlide(i){
+  document.querySelectorAll('.slide').forEach((s,j)=>s.classList.toggle('active',j===i));
+  document.querySelectorAll('.nav-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  if(i===1&&!charts.bil) buildBil();
+  if(i===2&&!charts.var) buildVar();
+  if(i===4&&!charts.sim){buildSim();simUpdate();}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function buildBil(){
+  charts.bil=new Chart(document.getElementById('cBil'),{
+    type:'bar',
+    data:{labels:MESES,datasets:[
+      {label:'2024',data:BIL24,backgroundColor:'rgba(26,26,26,0.8)',borderRadius:4},
+      {label:'2025',data:BIL25,backgroundColor:'rgba(200,169,81,0.85)',borderRadius:4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fr(c.raw)}}},
+      scales:{
+        y:{ticks:{callback:v=>'R$'+(v/1000).toFixed(0)+'K',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},
+        x:{ticks:{font:{size:11},autoSkip:false,maxRotation:0},grid:{display:false}}
+      }}
+  });
+}
+
+function buildVar(){
+  const pct=BIL25.map((v,i)=>Math.round((v/BIL24[i]-1)*100));
+  charts.var=new Chart(document.getElementById('cVar'),{
+    type:'bar',
+    data:{labels:MESES,datasets:[{
+      label:'Var %',data:pct,
+      backgroundColor:pct.map(v=>v>=0?'rgba(59,109,17,0.8)':'rgba(163,45,45,0.8)'),
+      borderRadius:4
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'%'}}},
+      scales:{
+        y:{ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},
+        x:{ticks:{font:{size:11},autoSkip:false,maxRotation:0},grid:{display:false}}
+      }}
+  });
+}
+
+function buildSim(){
+  charts.sim=new Chart(document.getElementById('cSim'),{
+    type:'bar',
+    data:{
+      labels:['CRVG — Atual','SAF — Atual','CRVG — Proposta','SAF — Proposta'],
+      datasets:[{data:[0,0,0,0],
+        backgroundColor:['rgba(200,169,81,0.5)','rgba(26,26,26,0.25)','rgba(200,169,81,0.9)','rgba(26,26,26,0.6)'],
+        borderRadius:5
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fr(c.raw)}}},
+      scales:{
+        y:{ticks:{callback:v=>'R$'+(v/1000).toFixed(0)+'K',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},
+        x:{ticks:{font:{size:11}},grid:{display:false}}
+      }}
+  });
+}
+
+function simUpdate(){
+  const bil=parseInt(document.getElementById('slBil').value);
+  document.getElementById('lBil').textContent=fr(bil);
+  const pct=(bil/META_MIN)*100;
+  const bw=Math.min(100,(bil-MIN_R)/(MAX_R-MIN_R)*100);
+  const fill=document.getElementById('pFill');
+  fill.style.width=bw+'%';
+  fill.style.background=bil>=META_MIN?'#3B6D11':'#C8A951';
+  const lp=document.getElementById('lPct');
+  lp.textContent=pct.toFixed(1)+'%';
+  lp.style.color=bil>=META_MIN?'#3B6D11':'#C8A951';
+
+  const rep=0.25*bil,tef_a=0.05*0.75*bil,saf_a=bil-rep-tef_a-CUSTOS;
+  document.getElementById('a1').textContent=fr(bil);
+  document.getElementById('a2').textContent='− '+fr(rep);
+  document.getElementById('a3').textContent='− '+fr(tef_a);
+  document.getElementById('a4').textContent='− '+fr(CUSTOS);
+  document.getElementById('a5').textContent=fr(saf_a);
+  document.getElementById('a6').textContent=fr(rep);
+
+  const tef_b=0.05*bil,res=bil-tef_b-CUSTOS,split=res*0.5;
+  document.getElementById('b1').textContent=fr(bil);
+  document.getElementById('b2').textContent='− '+fr(tef_b);
+  document.getElementById('b3').textContent='− '+fr(CUSTOS);
+  document.getElementById('b4').textContent=fr(res);
+  document.getElementById('b5').textContent=fr(split);
+  document.getElementById('b6').textContent=fr(split);
+
+  const sv=(split/META_SAF-1)*100;
+  const sd=document.getElementById('sSaf');
+  sd.textContent=fp(sv)+' ('+fr(split)+')';
+  sd.style.color=split>=META_SAF?'#3B6D11':split>META_SAF*0.9?'#854F0B':'#A32D2D';
+
+  const cv=(split/CRVG_MEDIA-1)*100;
+  const cd=document.getElementById('sCrvg');
+  cd.textContent=fp(cv)+' ('+fr(split)+')';
+  cd.style.color=cv>0?'#3B6D11':'#A32D2D';
+
+  const gv=(bil/BIL25T-1)*100;
+  const gd=document.getElementById('sGrow');
+  gd.textContent=fp(gv)+' vs R$ 1,42M';
+  gd.style.color=gv>0?'#3B6D11':'#A32D2D';
+
+  if(charts.sim){
+    charts.sim.data.datasets[0].data=[Math.round(rep),Math.round(saf_a),Math.round(split),Math.round(split)];
+    charts.sim.update('none');
+  }
+}
+
+document.getElementById('slBil').addEventListener('input',simUpdate);
+</script>
+</body>
+</html>
